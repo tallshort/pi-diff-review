@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { ReviewComponent } from "../../src/review/component.ts";
+import {
+  buildCommentFromSelection,
+  buildGlobalComment,
+} from "../../src/review/comments.ts";
 import type { DiffExplainer } from "../../src/explanation/explainer.ts";
 import type {
   PersistedAsk,
@@ -120,6 +124,48 @@ function createComponent(
 }
 
 describe("ReviewComponent", () => {
+  it("clears all review comments with X, including other files and the overall comment", () => {
+    const lines = buildMultiFileLines();
+    const component = createComponent(lines);
+    const state = component as any;
+    const comments = [
+      buildCommentFromSelection(lines, { start: 2, end: 2 }, "first"),
+      buildCommentFromSelection(lines, { start: 1, end: 2 }, "range"),
+      buildCommentFromSelection(lines, { start: 5, end: 5 }, "other file"),
+      buildGlobalComment("overall"),
+    ];
+    for (const comment of comments) state.comments.set(comment.id, comment);
+    let changes = 0;
+    state.onCommentsChanged = () => changes++;
+    state.selected = 0;
+    component.render(100);
+
+    component.handleInput("X");
+
+    assert.equal(state.comments.size, 0);
+    assert.equal(changes, 1);
+    assert.equal(state.commentsRevision, 1);
+    assert.ok(!component.render(100).some((row) => row.includes("first")));
+
+    component.handleInput("X");
+    assert.equal(changes, 1);
+    assert.equal(state.commentsRevision, 1);
+  });
+
+  it("ignores X when there are no comments", () => {
+    const component = createComponent([]);
+    assert.doesNotThrow(() => component.handleInput("X"));
+    assert.equal((component as any).commentsRevision, 0);
+  });
+
+  it("treats X as text when editing a comment", () => {
+    const component = createComponent(buildLines(3));
+    component.handleInput("c");
+    component.handleInput("X");
+    assert.equal((component as any).editor.getText(), "X");
+    assert.equal((component as any).commentsRevision, 0);
+  });
+
   it("supports PgUp and PgDown in the diff view", () => {
     const component = createComponent(buildLines(40));
 

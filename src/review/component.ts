@@ -81,6 +81,7 @@ const HELP_COMMANDS = [
   ["c", "add or edit a line or range comment"],
   ["C", "add or edit an overall diff comment"],
   ["x", "delete the current line or range comment"],
+  ["X", "delete all review comments across all files"],
   ["t", "toggle the file sidebar"],
   ["s", "toggle inline comments and explanations"],
   ["v", "toggle unified or split rendering"],
@@ -430,6 +431,10 @@ export class ReviewComponent {
     }
     if (data === "x") {
       this.deleteComment();
+      return;
+    }
+    if (data === "X") {
+      this.deleteAllComments();
       return;
     }
     if (data === "c") {
@@ -1743,6 +1748,13 @@ export class ReviewComponent {
       }
       index += direction;
     }
+  }
+
+  private deleteAllComments(): void {
+    if (this.comments.size === 0) return;
+    this.comments.clear();
+    this.markCommentsChanged();
+    this.tui.requestRender();
   }
 
   private deleteComment(): void {
