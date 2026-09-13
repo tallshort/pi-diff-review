@@ -1,4 +1,3 @@
-import { streamSimple } from "@earendil-works/pi-ai";
 import type { ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 import type { AssistantMessage, Context } from "@earendil-works/pi-ai";
 
@@ -90,6 +89,11 @@ export class PiModelDiffExplainer implements DiffExplainer {
       throw new Error(auth.error);
     }
 
+    const provider = this.ctx.modelRegistry.getProvider(model.provider);
+    if (!provider) {
+      throw new Error(`No provider is registered for ${model.provider}.`);
+    }
+
     const context: Context = {
       systemPrompt:
         "You explain code clearly and concisely for review. Focus on intent, behavior, and risk. Avoid restating every line.",
@@ -105,7 +109,7 @@ export class PiModelDiffExplainer implements DiffExplainer {
     };
 
     let streamedText = "";
-    const stream = streamSimple(model, context, {
+    const stream = provider.streamSimple(model, context, {
       apiKey: auth.apiKey,
       headers: auth.headers,
       signal: options.signal,
