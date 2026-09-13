@@ -29,8 +29,7 @@ export type ReviewLine = {
 };
 
 export type ReviewResult =
-  | { action: "submit"; comments: ReviewComment[] }
-  | { action: "cancel" };
+  { action: "submit"; comments: ReviewComment[] } | { action: "cancel" };
 
 export type SelectionBounds = {
   start: number;

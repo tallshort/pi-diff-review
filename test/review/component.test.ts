@@ -455,9 +455,7 @@ describe("ReviewComponent", () => {
 
   it("q clears an active selection before exiting", () => {
     let result:
-      | { action: "submit"; comments: any[] }
-      | { action: "cancel" }
-      | undefined;
+      { action: "submit"; comments: any[] } | { action: "cancel" } | undefined;
     const component = createComponent(buildLines(6), {
       done: (next) => {
         result = next;
