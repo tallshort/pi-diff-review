@@ -114,6 +114,7 @@ Open one or more files or folders with `/view`:
 - `c` to add or edit a comment for the current line or selected range
 - `C` to add or edit an overall diff comment
 - `x` to delete a comment for the current line or selected range
+- `X` to delete all review comments across all files in the review, including the overall diff comment
 - `Enter` to submit comments back to pi
 - Comments are cached per session and restored when reopening the same diff or view
 - File comments are also persisted in a repo-local workspace store and shown again in `/view` or on matching lines in `/diff`
